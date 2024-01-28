@@ -39,7 +39,7 @@ jobs:
             channels: conda-forge,defaults
             channel-priority: true
             extra-specs: |
-              python=3.11
+              python=3.10
             auto-activate-base: false
             activate-environment: "tardigrade-env"
       - name: check solution
