@@ -4,7 +4,7 @@ cmake>=3.18
 doxygen>=1.9
 eigen>=3.3.7
 compilers
-setuptools_scm>=6.2
+setuptools_scm>=6.2,<8
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
