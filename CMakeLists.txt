@@ -101,6 +101,7 @@ set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools" "tardig
 # that xdmf is installed. This requirement may change in time
 set(optional_upstream_packages "overlap_coupling")
 include(FetchContent)
+set(additional_fetchcontent_source_directories "")
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
     set(${package_upper}_BUILD_PYTHON_BINDINGS OFF CACHE INTERNAL "Setting ${package}'s python binding flag to off")
@@ -117,6 +118,7 @@ foreach(package ${upstream_packages})
             GIT_TAG        origin/dev
         )
         FetchContent_MakeAvailable(${package})
+        set(additional_fetchcontent_source_directories ${additional_fetchcontent_source_directories} "${${package}_SOURCE_DIR}/src/cpp")
     endif()
 endforeach(package)
 

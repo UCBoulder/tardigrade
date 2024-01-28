@@ -54,7 +54,7 @@ include $(MOOSE_DIR)/modules/modules.mk
 
 # dep apps
 APPLICATION_DIR    := @PROJECT_BINARY_DIR@
-ANACONDA_INCLUDE   := $(CONDA_PREFIX)/include
+ANACONDA_INCLUDE   := $(CONDA_PREFIX)/include @additional_fetchcontent_source_directories@
 ANACONDA_LIB       := $(CONDA_PREFIX)/lib
 APPLICATION_NAME   := tardigrade
 BUILD_EXEC         := yes
