@@ -1,5 +1,6 @@
 #===================================================================================================== PROJECT SETUP ===
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.19)
+cmake_policy(SET CMP0110 NEW)
 project(tardigrade)
 set(PROJECT_EXECUTABLE_NAME "tardigrade-opt")
 
@@ -41,7 +42,6 @@ if(${not_conda_test} STREQUAL "true")
     execute_process(COMMAND ${Python_EXECUTABLE} -m setuptools_scm
                             OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING_FULL
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
-    message("output: ${${PROJECT_NAME}_VERSION_STRING_FULL}")
     if(${${PROJECT_NAME}_VERSION_STRING_FULL} STREQUAL "")
         set(${PROJECT_NAME}_VERSION 0.0.0)
     else()
