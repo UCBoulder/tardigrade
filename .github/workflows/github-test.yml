@@ -25,17 +25,6 @@ jobs:
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
-      - name: MiniConda setup
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-            miniforge-variant: Mambaforge
-            channels: conda-forge,defaults
-            channel-priority: true
-            auto-activate-base: false
-            activate-environment: "test-environment"
-      - name: check solution
-        run: |
-          conda env export
       - name: Set reusable strings
         id: strings
         shell: bash
@@ -43,6 +32,19 @@ jobs:
             echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
             echo "environment-file=${{ github.workspace }}/reduced_environment.txt" >> "$GITHUB_OUTPUT"
             echo "moose-dir=${{ github.workspace }}/moose-dir" >> "$GITHUB_OUTPUT"
+      - name: MiniConda setup
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            channels: conda-forge,defaults
+            channel-priority: true
+            extra-specs: |
+              python=3.11
+            auto-activate-base: false
+            activate-environment: "tardigrade-env"
+      - name: check solution
+        run: |
+          conda env export
       - name: Conda environment
         shell: bash -el {0}
         run: |
@@ -63,7 +65,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          conda activate test-environment
+          conda activate tardigrade-env
           export MOOSE_DIR=${{ steps.strings.outputs.moose-dir }}
           cmake .. -DTARDIGRADE_BUILD_PYTHON_BINDINGS=OFF
           make -j 4
@@ -71,7 +73,7 @@ jobs:
         shell: bash -el {0}
 #        working-directory: ${{ steps.strings.outputs.build-output-dir }}
         run: |
-          conda activate test-environment
+          conda activate tardigrade-env
           export MOOSE_DIR=${{ steps.strings.outputs.moose-dir }}
           cd build
           ctest
