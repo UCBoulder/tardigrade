@@ -8,6 +8,6 @@ setuptools_scm>=6.2
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
-moose-dev
+moose-dev>=2023.12.20
 mamba
 numpy>=1.17
