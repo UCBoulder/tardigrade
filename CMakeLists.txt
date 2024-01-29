@@ -1,5 +1,6 @@
 #===================================================================================================== PROJECT SETUP ===
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.19)
+cmake_policy(SET CMP0110 NEW)
 project(tardigrade)
 set(PROJECT_EXECUTABLE_NAME "tardigrade-opt")
 
@@ -36,18 +37,16 @@ elseif(cmake_build_type_lower STREQUAL "conda-test")
 endif()
 
 # Get version number from Git
-set(VERSION_UPDATE_FROM_GIT True)
 if(${not_conda_test} STREQUAL "true")
-    # TODO: On osx-arm64 some c++ projects struggle to find $PREFIX/bin/python during conda-builds and others don't.
-    # Trace the source and remove the hint when CMake configures with the correct python version during conda-build.
-    if (DEFINED ENV{PREFIX})
-        set(Python_ROOT_DIR "$ENV{PREFIX}/bin")
-    endif()
     find_package(Python COMPONENTS Interpreter REQUIRED)
     execute_process(COMMAND ${Python_EXECUTABLE} -m setuptools_scm
                             OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING_FULL
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" ${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL})
+    if(${${PROJECT_NAME}_VERSION_STRING_FULL} STREQUAL "")
+        set(${PROJECT_NAME}_VERSION 0.0.0)
+    else()
+         string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" ${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL})
+    endif()
     project(${PROJECT_NAME} VERSION ${${PROJECT_NAME}_VERSION})
 endif()
 
@@ -102,8 +101,12 @@ set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools" "tardig
 # that xdmf is installed. This requirement may change in time
 set(optional_upstream_packages "overlap_coupling")
 include(FetchContent)
+set(additional_fetchcontent_source_directories "")
+set(additional_fetchcontent_build_directories "")
+set(additional_fetchcontent_flag 0)
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
+    set(${package_upper}_BUILD_PYTHON_BINDINGS OFF CACHE INTERNAL "Setting ${package}'s python binding flag to off")
     find_package(${package} ${upstream_required} CONFIG)
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
@@ -113,10 +116,13 @@ foreach(package ${upstream_packages})
         # TODO: Decide how to handle main/dev build differences. bash env variables for GIT TAG?
         FetchContent_Declare(
             ${package}
-            GIT_REPOSITORY ssh://git@re-git.lanl.gov:10022/aea/material-models/${package}.git
+            GIT_REPOSITORY https://github.com/UCBoulder/${package}.git
             GIT_TAG        origin/dev
         )
         FetchContent_MakeAvailable(${package})
+        set(additional_fetchcontent_source_directories "${additional_fetchcontent_source_directories} -I${${package}_SOURCE_DIR}/src/cpp")
+        set(additional_fetchcontent_build_directories "${additional_fetchcontent_build_directories} -L${${package}_BINARY_DIR}/src/cpp")
+        set(additional_fetchcontent_flag 1)
     endif()
 endforeach(package)
 
@@ -192,6 +198,7 @@ include_directories(${CPP_INC_PATH})
 add_subdirectory(${CPP_SRC_PATH})
 add_subdirectory(${CPP_INC_PATH})
 add_subdirectory(${CPP_TEST_PATH})
+add_dependencies(${PROJECT_NAME} micromat microbalance)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     find_package(Boost 1.53.0 REQUIRED COMPONENTS unit_test_framework)
