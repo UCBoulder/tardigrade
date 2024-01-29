@@ -54,7 +54,7 @@ include $(MOOSE_DIR)/modules/modules.mk
 
 # dep apps
 APPLICATION_DIR    := @PROJECT_BINARY_DIR@
-ANACONDA_INCLUDE   := $(CONDA_PREFIX)/include @additional_fetchcontent_source_directories@
+ANACONDA_INCLUDE   := $(CONDA_PREFIX)/include
 ANACONDA_LIB       := $(CONDA_PREFIX)/lib
 APPLICATION_NAME   := tardigrade
 BUILD_EXEC         := yes
@@ -69,6 +69,14 @@ ifeq (@xdmf_FOUND@,1)
     ADDITIONAL_CPPFLAGS += -I@XDMF_INCLUDE_DIRS@
     ADDITIONAL_CPPFLAGS += -I@LIBXML2_INCLUDE_DIR@
     ADDITIONAL_CPPFLAGS += -I@BOOST_INCLUDE_DIR@
+endif
+
+ifeq (@additional_fetchcontent_flag@,1)
+    ADDITIONAL_CPPFLAGS += @additional_fetchcontent_source_directories@
+endif
+
+ifeq (@additional_fetchcontent_flag@,1)
+    ADDITIONAL_LIBS += @additional_fetchcontent_build_directories@
 endif
 
 ifeq (@overlap_coupling_FOUND@,1)
