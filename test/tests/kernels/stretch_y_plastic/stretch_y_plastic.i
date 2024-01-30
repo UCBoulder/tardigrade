@@ -504,7 +504,7 @@
   [./macro_isv]
     type = MaterialStdVectorAux
     property = SDVS
-    index = 0
+    index = 50
     variable = macro_isv
   [../]
 []
@@ -513,7 +513,7 @@
   [./micro_isv]
     type = MaterialStdVectorAux
     property = SDVS
-    index = 1
+    index = 51
     variable = micro_isv
   [../]
 []
@@ -522,7 +522,7 @@
   [./micro_gradient_isv_1]
     type = MaterialStdVectorAux
     property = SDVS
-    index = 2
+    index = 52
     variable = micro_gradient_isv_1
   [../]
 []
@@ -531,7 +531,7 @@
   [./micro_gradient_isv_2]
     type = MaterialStdVectorAux
     property = SDVS
-    index = 3
+    index = 53
     variable = micro_gradient_isv_2
   [../]
 []
@@ -540,7 +540,7 @@
   [./micro_gradient_isv_3]
     type = MaterialStdVectorAux
     property = SDVS
-    index = 4
+    index = 54
     variable = micro_gradient_isv_3
   [../]
 []

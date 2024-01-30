@@ -1,4 +1,4 @@
-set(${PROJECT_NAME}_kernels_TESTS "const_mms" "linear_mms" "rotate_stretch" "stretch_y" "const_mms_overlap" "linear_mms_overlap" "simple_diffusion")# "stretch_y_plastic")
+set(${PROJECT_NAME}_kernels_TESTS "const_mms" "linear_mms" "rotate_stretch" "stretch_y" "const_mms_overlap" "linear_mms_overlap" "simple_diffusion" "stretch_y_plastic")
 
 set(${PROJECT_NAME}_overlap_coupling_TESTS "const_mms_overlap" "linear_mms_overlap" "overlapping_columns")
 
