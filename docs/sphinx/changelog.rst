@@ -7,8 +7,30 @@ Changelog
 
 
 ******************
-0.1.0 (unreleased)
+0.2.1 (unreleased)
 ******************
+
+Internal Changes
+================
+- Enabled github actions (:pull:`1`). By `Nathan Miller`_.
+- Corrected plastic deformation test (:pull:`2`). By `Nathan Miller`_.
+- Added flag so that all errors will be treated as convergence errors by default. (:pull:`3`). By `Nathan Miller`_.
+
+******************
+0.2.0 (2023-12-06)
+******************
+
+Release
+=======
+- Released version 0.2.0. By `Nathan Miller`_.
+
+******************
+0.1.0 (2022-09-12)
+******************
+
+Release
+=======
+- Released version 0.1.0. By `Nathan Miller`_.
 
 Internal Changes
 ================

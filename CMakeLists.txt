@@ -64,6 +64,13 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt")
 endif()
 
+# Force all errors to be convergence errors
+set(TARDIGRADE_SET_FATAL_AS_CONVERGENCE ON CACHE BOOL "Flag for whether to force fatal errors to be treated as convergence errors")
+
+if(TARDIGRADE_SET_FATAL_AS_CONVERGENCE)
+    add_compile_definitions(TARDIGRADE_FATAL_AS_CONVERGENCE)
+endif()
+
 # Enable CTest
 enable_testing()
 
