@@ -54,7 +54,7 @@ jobs:
         run: |
           if [[ ${{ github.event.pull_request.base.ref }} == "dev_next" ]]
           then
-            moose_target_repo="dev_next https://github.com/NateAM/moose.git"
+            moose_target_repo="next https://github.com/idaholab/moose.git"
           else
             moose_target_repo="master https://github.com/idaholab/moose.git"
           fi
