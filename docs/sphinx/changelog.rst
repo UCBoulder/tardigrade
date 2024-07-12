@@ -15,6 +15,7 @@ Internal Changes
 - Enabled github actions (:pull:`1`). By `Nathan Miller`_.
 - Corrected plastic deformation test (:pull:`2`). By `Nathan Miller`_.
 - Added flag so that all errors will be treated as convergence errors by default. (:pull:`3`). By `Nathan Miller`_.
+- Allow for different versions of supporting packages to be specified when doing FetchContent builds (:pull:`5`). By `Nathan Miller`_.
 
 ******************
 0.2.0 (2023-12-06)

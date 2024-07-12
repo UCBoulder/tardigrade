@@ -22,6 +22,10 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ADDITIONAL_INSTALL_DIRECTORIES})
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
 
+# Set the number of cores available for building moose
+set(MOOSE_BUILD_CORE_COUNT 4 CACHE STRING "The number of cores available to build moose")
+set(TARDIGRADE_TEST_CORE_COUNT 4 CACHE STRING "The number of cores available to test tardigrade")
+
 # Set build type checks
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower)
 set(upstream_required "")
@@ -120,11 +124,14 @@ foreach(package ${upstream_packages})
     else()
         # Find related, but external, projects using FetchContent and building locally
         message(WARNING "Did not find an installed ${package} package. Attempting local build with FetchContent.")
-        # TODO: Decide how to handle main/dev build differences. bash env variables for GIT TAG?
+        if(NOT DEFINED ${package_upper}_FETCHCONTENT_VERSION)
+            set(${package_upper}_FETCHCONTENT_VERSION "origin/dev")
+        endif()
+        message("${package_upper} is being built with version ${${package_upper}_FETCHCONTENT_VERSION}")
         FetchContent_Declare(
             ${package}
             GIT_REPOSITORY https://github.com/UCBoulder/${package}.git
-            GIT_TAG        origin/dev
+            GIT_TAG        ${${package_upper}_FETCHCONTENT_VERSION}
         )
         FetchContent_MakeAvailable(${package})
         set(additional_fetchcontent_source_directories "${additional_fetchcontent_source_directories} -I${${package}_SOURCE_DIR}/src/cpp")
@@ -198,7 +205,7 @@ if(cmake_build_type_lower STREQUAL release)
 endif()
 
 add_custom_target(${PROJECT_NAME} ALL
-                  COMMAND MOOSE_DIR=$ENV{MOOSE_DIR} make -j4 -f "${PROJECT_NAME}_Makefile"
+                  COMMAND MOOSE_DIR=$ENV{MOOSE_DIR} make -j ${MOOSE_BUILD_CORE_COUNT} -f "${PROJECT_NAME}_Makefile"
                   WORKING_DIRECTORY ${PROJECT_BINARY_DIRECTORY})
 
 include_directories(${CPP_INC_PATH})
@@ -213,7 +220,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     target_sources(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/testroot")
     target_sources(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/run_tests")
     add_test(NAME "${PROJECT_NAME}_Regression_Tests"
-             COMMAND run_tests
+             COMMAND run_tests -j ${TARDIGRADE_TEST_CORE_COUNT}
              WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     set_tests_properties("${PROJECT_NAME}_Regression_Tests" PROPERTIES
                          ENVIRONMENT MOOSE_DIR=$ENV{MOOSE_DIR} )

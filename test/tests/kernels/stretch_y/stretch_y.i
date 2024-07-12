@@ -571,30 +571,78 @@
 []
 
 [Executioner]
-#  type = Steady
   type = Transient
-  num_steps = 10
-  dt        = 0.1
-  solve_type = 'PJFNK'
-#  solve_type = 'NEWTON'
+
+  solve_type = NEWTON
+  petsc_options_iname = '-pc_type -pc_factor_mat_solver_package'
+  petsc_options_value = 'lu       superlu_dist                 '
+
+  line_search = none
+  automatic_scaling = true
+
   nl_rel_tol = 1e-8
   nl_abs_tol = 1e-8
-  nl_max_its = 100
-  #Terms for debugging
-#  petsc_options = '-ksp_monitor_true_residual -ksp_compute_singularvalues' 
-#  petsc_options = '-snes_converged_reason -ksp_converged_reason'
-#  l_max_its  = 10
-#  petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
-#  petsc_options_value = 'hypre    boomeramg      100'
-#  petsc_options_iname = '-ksp_gmres_restart'
-#  petsc_options_value = '100'
-#  petsc_options = '-snes_ksp_ew -ksp_monitor_true_residual -ksp_compute_singularvalues'# -pc_svd_monitor'
-#  petsc_options = '-ksp_monitor_true_residual -ksp_compute_singularvalues'# -pc_svd_monitor'
-#  petsc_options_iname = '-pc_type -sub_pc_type -pc_asm_overlap -ksp_gmres_restart -print_linear_residuals'# -ksp_view_mat'
-#  petsc_options_value = 'asm      lu           1               101                false                  '# binary'
+  nl_max_its = 50
+
+  start_time = 0.0
+  end_time = 1.0
+
+  dtmin = 1e-12
+  dtmax= 5
+
+  [TimeStepper]
+    type = IterationAdaptiveDT
+    optimal_iterations = 8
+    iteration_window = 3
+    linear_iteration_ratio = 1000
+    growth_factor=1.2
+    cutback_factor=0.8
+    dt = 0.1
+  []
 []
 
 [Outputs]
   exodus = true
   perf_graph = true
+  print_linear_residuals = true
+  interval = 1
+  [log_output]
+    type = CSV
+  []
+#  file_base = 'test'
+  [pgraph]
+    type = PerfGraphOutput
+    execute_on = 'timestep_end final'
+    level = 2
+  []
 []
+
+
+#[Executioner]
+##  type = Steady
+#  type = Transient
+#  num_steps = 10
+#  dt        = 0.1
+#  solve_type = 'PJFNK'
+##  solve_type = 'NEWTON'
+#  nl_rel_tol = 1e-8
+#  nl_abs_tol = 1e-8
+#  nl_max_its = 100
+#  #Terms for debugging
+##  petsc_options = '-ksp_monitor_true_residual -ksp_compute_singularvalues' 
+##  petsc_options = '-snes_converged_reason -ksp_converged_reason'
+##  l_max_its  = 10
+##  petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
+##  petsc_options_value = 'hypre    boomeramg      100'
+##  petsc_options_iname = '-ksp_gmres_restart'
+##  petsc_options_value = '100'
+##  petsc_options = '-snes_ksp_ew -ksp_monitor_true_residual -ksp_compute_singularvalues'# -pc_svd_monitor'
+##  petsc_options = '-ksp_monitor_true_residual -ksp_compute_singularvalues'# -pc_svd_monitor'
+##  petsc_options_iname = '-pc_type -sub_pc_type -pc_asm_overlap -ksp_gmres_restart -print_linear_residuals'# -ksp_view_mat'
+##  petsc_options_value = 'asm      lu           1               101                false                  '# binary'
+#[]
+#
+#[Outputs]
+#  exodus = true
+#  perf_graph = true
+#[]
