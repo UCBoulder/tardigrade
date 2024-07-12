@@ -67,7 +67,7 @@ jobs:
           cd build
           conda activate tardigrade-env
           export MOOSE_DIR=${{ steps.strings.outputs.moose-dir }}
-          cmake .. -DTARDIGRADE_BUILD_PYTHON_BINDINGS=OFF
+          cmake .. -DTARDIGRADE_BUILD_PYTHON_BINDINGS=OFF -DMOOSE_BUILD_CORE_COUNT=1 -DTARDIGRADE_TEST_CORE_COUNT=1
           make -j 4
       - name: Test
         shell: bash -el {0}
