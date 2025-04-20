@@ -1,1 +1,1 @@
-target_sources(${PROJECT_NAME} PRIVATE "MicromorphicMaterial.h")
+target_sources(${PROJECT_NAME} PRIVATE "MicromorphicMaterial.h"  "MicromorphicMaterialHeterogeneous.h")
