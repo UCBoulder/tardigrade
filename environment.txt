@@ -10,6 +10,5 @@ sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
 moose-dev
-moose-libmesh
 mamba
 numpy>=1.17
