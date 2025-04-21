@@ -77,4 +77,4 @@ jobs:
           export MOOSE_DIR=${{ steps.strings.outputs.moose-dir }}
           export LD_LIBRARY_PATH=${{ steps.strings.outputs.build-output-dir }}/_deps/tardigrade_micromorphic_element-build/src/cpp
           cd build
-          ctest
+          ctest -V
