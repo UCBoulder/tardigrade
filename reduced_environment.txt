@@ -8,6 +8,6 @@ setuptools_scm>=6.2,<8
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
-moose-dev=2025.*=mpich
+moose-dev>=2025.*=mpich
 moose-libmesh
 numpy>=1.17
