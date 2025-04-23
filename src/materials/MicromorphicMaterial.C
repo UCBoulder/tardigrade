@@ -846,7 +846,7 @@ void MicromorphicMaterial::computeQpProperties(){
         debug.clear();
 #endif
 
-        errorCode = material->evaluate_model( time, _fparams,
+        errorCode = material->evaluate_model( time, fparams,
                                               mms_grad_u, mms_phi, mms_grad_phi,
                                               mms_old_grad_u, mms_old_phi, mms_old_grad_phi,
                                               mms_SDVS,
