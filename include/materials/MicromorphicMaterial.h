@@ -43,7 +43,14 @@ class MicromorphicMaterial : public Material
     protected:
         virtual void initQpStatefulProperties() override;
         virtual void computeQpProperties() override;
+        virtual void defineMaterialParameters( std::vector< double > &parameters ){
+            /*!
+              * A function that allows the material properties to be redefined if necessary
+              */
 
+            parameters = _fparams;
+
+        }
     private:
 
         //Parameters
