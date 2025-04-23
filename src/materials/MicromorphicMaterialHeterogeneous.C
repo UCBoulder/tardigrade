@@ -33,6 +33,22 @@ void MicromorphicMaterialHeterogeneous::initQpStatefulProperties(){
     MicromorphicMaterial::initQpStatefulProperties(); 
 }
 
+void MicromorphicMaterialHeterogeneous::defineMaterialParameters( std::vector< double > &parameters ){
+    /*!
+      * A function that allows the material properties to be redefined if necessary
+      */
+
+    MicromorphicMaterial::defineMaterialParameters( parameters );
+
+    for ( unsigned int i =0; i < _user_material_prop_indices.size( ); ++i ){
+
+        parameters[ _user_material_prop_indices[ i ] ] = ( *_user_materials[ i ] )[ _qp ];
+
+    }
+
+}
+
+
 MicromorphicMaterialHeterogeneous::MicromorphicMaterialHeterogeneous(const InputParameters & parameters)
     : MicromorphicMaterial(parameters),
 
