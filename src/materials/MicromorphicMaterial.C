@@ -478,12 +478,16 @@ void MicromorphicMaterial::computeQpProperties(){
     //Set the state variables to the previously converged values
     _SDVS[ _qp ] = _old_SDVS[ _qp ];
 
+    //load material parameters into fparams array
+    std::vector< double > fparams;
+    defineMaterialParameters( fparams );
+
 //    if ( _qp == 0 ){
 //        std::cout << "SDVS pre model evaluation:\n";
 //        vectorTools::print( _SDVS[ _qp ] );
 //    }
 
-    int errorCode = material->evaluate_model( time, _fparams,
+    int errorCode = material->evaluate_model( time, fparams,
                                               __grad_u, __phi, __grad_phi,
                                               __old_grad_u, __old_phi, __old_grad_phi,
                                               _SDVS[ _qp ],
