@@ -25,12 +25,12 @@ class MicromorphicMaterialHeterogeneous : public MicromorphicMaterial
     protected:
         virtual void initQpStatefulProperties() override;
         virtual void computeQpProperties() override;
+        virtual void defineMaterialParameters( std::vector< double > &parameters ) override;
 
     private:
-        // For varying material parameters
-        const std::vector<std::string> & _user_material_prop_names;
-        const std::vector<unsigned int> & _user_material_prop_indices;
-        std::vector<const MaterialProperty<Real> *> _user_materials;
+        const std::vector<std::string> & _user_material_prop_names; //!< string mapping _user_material_prop_indices to GenericFunctionMaterial prop_names
+        const std::vector<unsigned int> & _user_material_prop_indices; //!< string of indices specifying which values in material_fparameters will be replaced by GenericFunctionMaterial
+        std::vector<const MaterialProperty<Real> *> _user_materials; //! array for storing unique material properties
 };
 
 #endif
