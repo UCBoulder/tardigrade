@@ -61,3 +61,4 @@
 .. _`Prabhu Khalsa`: prabhu@lanl.gov
 .. _`Sergio Cordova`: sergioc@lanl.gov
 .. _`w13dev`: w13dev@lanl.gov
+.. _`Thomas Allard`: thomas.allard@colorado.edu

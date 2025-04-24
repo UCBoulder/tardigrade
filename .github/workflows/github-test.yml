@@ -35,7 +35,7 @@ jobs:
       - name: MiniConda setup
         uses: conda-incubator/setup-miniconda@v2
         with:
-            miniforge-variant: Mambaforge
+            miniforge-variant: Miniforge3
             channels: conda-forge,defaults
             channel-priority: true
             extra-specs: |
@@ -48,7 +48,7 @@ jobs:
       - name: Conda environment
         shell: bash -el {0}
         run: |
-            mamba install --file ${{ steps.strings.outputs.environment-file }} --yes --channel https://conda.software.inl.gov/public --channel conda-forge
+            conda install --file ${{ steps.strings.outputs.environment-file }} --yes --channel https://conda.software.inl.gov/public --channel conda-forge --solver=libmamba
       - name: Get MOOSE
         shell: bash -el {0}
         run: |
@@ -77,4 +77,4 @@ jobs:
           export MOOSE_DIR=${{ steps.strings.outputs.moose-dir }}
           export LD_LIBRARY_PATH=${{ steps.strings.outputs.build-output-dir }}/_deps/tardigrade_micromorphic_element-build/src/cpp
           cd build
-          ctest
+          ctest -V
