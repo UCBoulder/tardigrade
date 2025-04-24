@@ -10,6 +10,11 @@ Changelog
 0.2.1 (unreleased)
 ******************
 
+New Features
+============
+- Added new MicromorphicMaterialHeterogeneous class for specifying spatially varying material properties
+  (:pull:`6`). By `Thomas Allard`_.
+
 Internal Changes
 ================
 - Enabled github actions (:pull:`1`). By `Nathan Miller`_.
