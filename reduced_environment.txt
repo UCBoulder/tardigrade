@@ -1,4 +1,4 @@
-boost>=1.59,<=1.80
+boost>=1.59
 breathe>=4.30.0
 cmake>=3.18
 doxygen>=1.9
