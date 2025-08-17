@@ -14,6 +14,10 @@ New Features
 ============
 - Added new MicromorphicMaterialHeterogeneous class for specifying spatially varying material properties
   (:pull:`6`). By `Thomas Allard`_.
+- Added rigid contact boundary conditions for moving plane and cylindrical surfaces (:pull:`7`).
+  By `Thomas Allard`_.
+- Added node and time varying boundary conditions by reading from CSV files. (:pull:`8`).
+  By `Thomas Allard`_.
 
 Internal Changes
 ================
