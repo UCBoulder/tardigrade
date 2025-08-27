@@ -23,11 +23,11 @@ class CSVTimeHistoryDirichletBC : public DirichletBCBase
 
     private:
 
-        struct Series
+        struct Series //!< Struct for storing nodal Dirichlet BC time series unpacked from a CSV file
         {
-            std::vector< Real > t;
-            std::vector< Real > v;
-            Real interpolate( Real time ) const;
+            std::vector< Real > t; //!< The time values
+            std::vector< Real > v; //!< The nodal Dirichlet BC values
+            Real interpolate( Real time ) const; //!< Function for interpolating values between time values
         };
 
         // parameters
@@ -35,8 +35,8 @@ class CSVTimeHistoryDirichletBC : public DirichletBCBase
         const bool _enforce_zero_beyond; //!< If true, prescribe 0.0 outside the CSV time range, otherwise hold end values
 
         // constructed at setup
-        std::unordered_map< dof_id_type, Series > _series_by_node;
-        std::unordered_set< dof_id_type > _boundary_node_ids;
+        std::unordered_map< dof_id_type, Series > _series_by_node; //!< Map between node IDs and their Dirichlet BC time series
+        std::unordered_set< dof_id_type > _boundary_node_ids; //!< The set of node IDs contained in the requested nodeset
 
 };
 
