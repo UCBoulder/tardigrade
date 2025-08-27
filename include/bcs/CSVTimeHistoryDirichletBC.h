@@ -31,8 +31,8 @@ class CSVTimeHistoryDirichletBC : public DirichletBCBase
         };
 
         // parameters
-        const std::string _csv_path; // Path to CSV with time in first column, node data in subsequent columns, and header containing 'time, node_id_1, node_id_2, ..., node_id_n'
-        const bool _enforce_zero_beyond; // If true, prescribe 0.0 outside the CSV time range, otherwise hold end values
+        const std::string _csv_path; //!< Path to CSV with time in first column, node data in subsequent columns, and header containing 'time, node_id_1, node_id_2, ..., node_id_n'
+        const bool _enforce_zero_beyond; //!< If true, prescribe 0.0 outside the CSV time range, otherwise hold end values
 
         // constructed at setup
         std::unordered_map< dof_id_type, Series > _series_by_node;
