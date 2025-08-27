@@ -12,7 +12,7 @@ CylindricalSurfaceDirichletBC::validParams()
     params.addRequiredParam< Real >( "radius", "Radius of the cylindrical surface" );
     params.addRequiredParam< Real >( "velocity", "Magnitude of velocity of the plane along its normal" );
     params.addRequiredParam< RealVectorValue >( "axis", "Axis direction of the cylinder" );
-    params.addRequiredParam< RealVectorValue >( "normal", "Direction of motion" );
+    params.addRequiredParam< RealVectorValue >( "normal", "Direction of motion of surface" );
     params.addParam< bool >( "use_sector", false, "Limit BC to a sector between angle_min and angle_max" );
     params.addParam< Real >( "angle_min", 0.0, "Minimum angle in radians for active sector" );
     params.addParam< Real >( "angle_max", 6.28318530718, "Maximum angle in radians for active sector" );
