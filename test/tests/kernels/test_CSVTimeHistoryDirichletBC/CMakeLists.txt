@@ -1,0 +1,7 @@
+set(input_filename "test_CSVTimeHistoryDirichletBC.i")
+set(output_filename "gold/test_CSVTimeHistoryDirichletBC_out.e")
+set(bc_csvs "top_bc_u1.csv" "top_bc_u2.csv" "top_bc_u3.csv" "top_bc_phi33.csv" "all_nodes_phi31.csv")
+set(mesh_file "mesh.e")
+target_sources(${PROJECT_NAME} PRIVATE ${input_filename} ${mesh_file} ${bc_csvs})
+target_sources(${PROJECT_NAME} PRIVATE ${output_filename})
+target_sources(${PROJECT_NAME} PRIVATE "tests")

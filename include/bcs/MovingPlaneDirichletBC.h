@@ -21,9 +21,9 @@ class MovingPlaneDirichletBC : public DirichletBCBase
 
     private:
 
-        Point _p0;
-        Real _velocity;
-        RealVectorValue _normal;
+        Point _p0; //!< A point on the plane prior to motion
+        Real _velocity; //!< Magnitude of velocity of the plane along its normal
+        RealVectorValue _normal; //!< Normal vector of the plane
 
         Real signedDistanceToPlane(const Point & pt) const;
 };
