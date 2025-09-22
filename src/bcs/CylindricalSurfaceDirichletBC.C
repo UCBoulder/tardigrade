@@ -68,15 +68,24 @@ CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParamet
 
 Real CylindricalSurfaceDirichletBC::computeQpValue(){
 
-    Real d = computeSignedDistanceToSurface( *_current_node );
+    if ( shouldApply( ) ){
 
-    RealVectorValue displacement_vector = -d * _normal;
+        Real d = computeSignedDistanceToSurface( *_current_node );
 
-    if ( _invert_displacement ){
-        displacement_vector *= -1.0;
+        RealVectorValue displacement_vector = -d * _normal;
+
+        if ( _invert_displacement ){
+            displacement_vector *= -1.0;
+        }
+
+//        std::cerr << _current_node->id( ) << ", " << shouldApply( ) << ", " << displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
+
+        return displacement_vector * _disp_dir;
+
     }
 
-    return displacement_vector * _disp_dir;
+    return _u[ _qp ];
+
 }
 
 bool CylindricalSurfaceDirichletBC::shouldApply() const{
@@ -90,6 +99,10 @@ bool CylindricalSurfaceDirichletBC::shouldApply() const{
     if ( _invert_displacement ){
         d *= -1.0;
     }
+
+//    if ( d <= 1e-8 ){
+//        std::cerr << _current_node->id( ) << "\n";
+//    }
 
     return d <= 1e-8;  // Apply only if node is outside or on the moving surface
 }
