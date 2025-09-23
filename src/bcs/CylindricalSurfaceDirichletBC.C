@@ -137,7 +137,7 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
             s *= -1.0;
         }
 
-        J -= s * radial_vec( val - _displacements.begin( ) ) / ( radial_vec.norm( ) + 1e-9 );
+        J -= s * radial_vec( val - _displacements.begin( ) ) * _disp_dir( val - _displacements.begin( ) ) / ( radial_vec.norm( ) + 1e-9 );
 
     }
 
