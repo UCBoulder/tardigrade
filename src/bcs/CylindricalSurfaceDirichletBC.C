@@ -17,6 +17,7 @@ CylindricalSurfaceDirichletBC::validParams()
     params.addParam< Real >( "angle_min", 0.0, "Minimum angle in radians for active sector" );
     params.addParam< Real >( "angle_max", 6.28318530718, "Maximum angle in radians for active sector" );
     params.addParam< bool >( "invert_displacement", false, "Reverse the sign of the displacement correction" );
+    params.addCoupledVar("displacements", "The displacements");
 
     return params;
 }
@@ -64,31 +65,88 @@ CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParamet
             mooseError( "Cannot determine direction from variable name: ", var_name );
         }
 
+        // Set the displacements
+        auto num_disp = coupledComponents( "displacements" );
+        for ( decltype( num_disp ) i = 0; i < num_disp; ++i ){
+            _displacements.push_back( coupled( "displacements", i ) );
+        }
+
 }
 
-Real CylindricalSurfaceDirichletBC::computeQpValue(){
+Real CylindricalSurfaceDirichletBC::computeQpValue( ){
 
-    if ( shouldApply( ) ){
+    mooseError( "This approach isn't allowed!" );
+
+}
+
+Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
+
+    if ( isOverclosed( ) ){
 
         Real d = computeSignedDistanceToSurface( *_current_node );
 
         RealVectorValue displacement_vector = -d * _normal;
 
+        Real s = 1.0;
         if ( _invert_displacement ){
-            displacement_vector *= -1.0;
+            s *= -1.0;
         }
 
-//        std::cerr << _current_node->id( ) << ", " << shouldApply( ) << ", " << displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
+//        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
 
-        return displacement_vector * _disp_dir;
+        return _u[ _qp ] - s * displacement_vector * _disp_dir;
 
     }
 
-    return _u[ _qp ];
+    return 0;
 
 }
 
-bool CylindricalSurfaceDirichletBC::shouldApply() const{
+Real CylindricalSurfaceDirichletBC::computeQpJacobian( ){
+
+    if ( isOverclosed( ) ){
+
+        return computeQpOffDiagJacobian( _var.number( ) );
+
+    }
+
+    return 0;
+
+}
+
+Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int jvar_num ){
+
+    auto val = std::find( _displacements.begin(), _displacements.end(), jvar_num );
+
+    Real J = 0;
+
+    if ( jvar_num == _var.number( ) ){
+
+        J += 1;
+
+    }
+
+    if ( val != _displacements.end( ) ){
+
+        RealVectorValue r_vec = *_current_node - _center;
+        Real axial_comp = r_vec * _axis;
+        RealVectorValue radial_vec = r_vec - axial_comp * _axis;
+
+        Real s = 1.0;
+        if ( _invert_displacement ){
+            s *= -1.0;
+        }
+
+        J -= s * radial_vec( val - _displacements.begin( ) ) / ( radial_vec.norm( ) + 1e-9 );
+
+    }
+
+    return J;
+
+}
+
+
+bool CylindricalSurfaceDirichletBC::isOverclosed() const{
 
     if ( !inAngularRange( *_current_node ) ){
         return false;
@@ -99,10 +157,6 @@ bool CylindricalSurfaceDirichletBC::shouldApply() const{
     if ( _invert_displacement ){
         d *= -1.0;
     }
-
-//    if ( d <= 1e-8 ){
-//        std::cerr << _current_node->id( ) << "\n";
-//    }
 
     return d <= 1e-8;  // Apply only if node is outside or on the moving surface
 }

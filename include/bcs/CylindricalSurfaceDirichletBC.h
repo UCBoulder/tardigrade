@@ -15,9 +15,17 @@ class CylindricalSurfaceDirichletBC : public DirichletBCBase
 
     protected:
 
-        virtual bool shouldApply() const override;
+        virtual bool isOverclosed() const;
 
-        virtual Real computeQpValue() override;
+        virtual Real computeQpValue( ) override;
+
+        virtual Real computeQpResidual() override;
+
+        virtual Real computeQpJacobian() override;
+
+        virtual Real computeQpOffDiagJacobian( const unsigned int jvar_num ) override;
+
+        std::vector<unsigned int> _displacements;
 
     private:
 
