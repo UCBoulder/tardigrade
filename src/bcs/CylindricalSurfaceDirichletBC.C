@@ -104,17 +104,17 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
 
 Real CylindricalSurfaceDirichletBC::computeQpJacobian( ){
 
-    if ( isOverclosed( ) ){
-
-        return computeQpOffDiagJacobian( _var.number( ) );
-
-    }
-
-    return 0;
+    return computeQpOffDiagJacobian( _var.number( ) );
 
 }
 
 Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int jvar_num ){
+
+    if ( !isOverclosed( ) ){
+
+        return 0;
+
+    }
 
     auto val = std::find( _displacements.begin(), _displacements.end(), jvar_num );
 
@@ -137,7 +137,17 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
             s *= -1.0;
         }
 
-        J -= s * radial_vec( val - _displacements.begin( ) ) * _disp_dir( val - _displacements.begin( ) ) / ( radial_vec.norm( ) + 1e-9 );
+        J -= s * radial_vec( val - _displacements.begin( ) ) * _normal * _disp_dir / ( radial_vec.norm( ) + 1e-9 );
+
+        if ( _current_node->id( ) == 1 ){
+
+            std::cerr << "d: " << _current_node->id( ) << ", " << computeSignedDistanceToSurface( *_current_node ) << "\n";
+
+        }
+
+        if ( _current_node->id( ) == 131 ){
+            std::cerr << "var.number: " << _var.number( ) << ", " << jvar_num << ", " << radial_vec << ", " << _disp_dir << ", " << J << "\n";
+        }
 
     }
 
