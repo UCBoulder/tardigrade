@@ -85,7 +85,10 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
 
         Real d = computeSignedDistanceToSurface( *_current_node );
 
-        RealVectorValue displacement_vector = -d * _normal;
+        const Point new_center = _center + _normal * ( _velocity * _t );
+        RealVectorValue r_vec = *_current_node - new_center;
+        Real axial_comp = r_vec * _axis;
+        RealVectorValue radial_vec = r_vec - axial_comp * _axis;
 
         Real s = 1.0;
         if ( _invert_displacement ){
@@ -94,7 +97,7 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
 
 //        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
 
-        return _u[ _qp ] - s * displacement_vector * _disp_dir;
+        return _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir;
 
     }
 
@@ -141,7 +144,8 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
             s *= -1.0;
         }
 
-        J += s * radial_vec( val - _displacements.begin( ) ) * _normal * _disp_dir / ( radial_vec.norm( ) + 1e-9 );
+        J += s * ( _radius / ( radial_vec.norm( ) * radial_vec.norm( ) * radial_vec.norm( ) + 1e-9 ) ) * radial_vec( val - _displacements.begin( ) ) * ( radial_vec * _disp_dir )
+           + s * ( 1 - _radius / ( radial_vec.norm( ) + 1e-9 ) ) * ( _disp_dir - _axis * _disp_dir * _axis )( val - _displacements.begin( ) );
 
 //        if ( _current_node->id( ) == 1 ){
 //
@@ -159,6 +163,7 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
 }
 
+bool CylindricalSurfaceDirichletBC::shouldApply( ) const{ return isOverclosed( ); }
 
 bool CylindricalSurfaceDirichletBC::isOverclosed() const{
 
