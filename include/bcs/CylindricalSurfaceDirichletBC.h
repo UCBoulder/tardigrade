@@ -15,6 +15,8 @@ class CylindricalSurfaceDirichletBC : public DirichletBCBase
 
     protected:
 
+        virtual bool shouldApply( ) const override;
+
         virtual bool isOverclosed() const;
 
         virtual Real computeQpValue( ) override;
