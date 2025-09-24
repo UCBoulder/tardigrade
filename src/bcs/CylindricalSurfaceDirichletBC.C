@@ -112,7 +112,7 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
     if ( !isOverclosed( ) ){
 
-        return 0;
+        return 1e-9;
 
     }
 
