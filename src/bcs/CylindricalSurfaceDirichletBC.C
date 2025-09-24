@@ -124,11 +124,15 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
         J += 1;
 
+//        if ( _current_node->id( ) == 131 ){
+//            std::cerr << "first jacobian for var.number: " << _var.number( ) << ", " << jvar_num << "\n";
+//        }
     }
 
     if ( val != _displacements.end( ) ){
 
-        RealVectorValue r_vec = *_current_node - _center;
+        const Point new_center = _center + _normal * ( _velocity * _t );
+        RealVectorValue r_vec = *_current_node - new_center;
         Real axial_comp = r_vec * _axis;
         RealVectorValue radial_vec = r_vec - axial_comp * _axis;
 
@@ -137,17 +141,17 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
             s *= -1.0;
         }
 
-        J -= s * radial_vec( val - _displacements.begin( ) ) * _normal * _disp_dir / ( radial_vec.norm( ) + 1e-9 );
+        J += s * radial_vec( val - _displacements.begin( ) ) * _normal * _disp_dir / ( radial_vec.norm( ) + 1e-9 );
 
-        if ( _current_node->id( ) == 1 ){
-
-            std::cerr << "d: " << _current_node->id( ) << ", " << computeSignedDistanceToSurface( *_current_node ) << "\n";
-
-        }
-
-        if ( _current_node->id( ) == 131 ){
-            std::cerr << "var.number: " << _var.number( ) << ", " << jvar_num << ", " << radial_vec << ", " << _disp_dir << ", " << J << "\n";
-        }
+//        if ( _current_node->id( ) == 1 ){
+//
+//            std::cerr << "d: " << _current_node->id( ) << ", " << computeSignedDistanceToSurface( *_current_node ) << "\n";
+//
+//        }
+//
+//        if ( _current_node->id( ) == 131 ){
+//            std::cerr << "var.number: " << _var.number( ) << ", " << jvar_num << ", " << s << ", " << *_current_node << ", " << _center << ", " << radial_vec << ", " << _normal << ", " << _disp_dir << ", " << J << "\n";
+//        }
 
     }
 
