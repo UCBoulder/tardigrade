@@ -105,7 +105,7 @@ Real CylindricalSurfaceNodalContact::computeQpResidual( ){
 
         if ( _current_node->id( ) == 1946 ){
 
-            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << _beta + _u_dot[ _qp ] << ": " << _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta + _u_dot[ _qp ] << "\n";
+            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << _beta * _u_dot[ _qp ] << ": " << _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ] << "\n";
 
         }
 
@@ -117,7 +117,7 @@ Real CylindricalSurfaceNodalContact::computeQpResidual( ){
 //        }
 
 //        std::cerr << "  returning residual\n";
-        return _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta + _u_dot[ _qp ];
+        return _penalty_parameter * ( s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ];
 
     }
 
@@ -145,7 +145,7 @@ Real CylindricalSurfaceNodalContact::computeQpOffDiagJacobian( const unsigned in
 
     if ( jvar_num == _var.number( ) ){
 
-        J -= _penalty_parameter + _beta * _du_dot_du[ _qp ];
+        J -= _beta * _du_dot_du[ _qp ];
 
 //        if ( _current_node->id( ) == 131 ){
 //            std::cerr << "first jacobian for var.number: " << _var.number( ) << ", " << jvar_num << "\n";
