@@ -31,6 +31,10 @@ class CylindricalSurfaceDirichletBC : public DirichletBCBase
 
     private:
 
+        const VariableValue & _u_dot; //!< The time derivative of the degree of freedom
+
+        const VariableValue & _du_dot_du; //!< The Jacobian of the time derivative of the degree of freedom w.r.t. the degree of freedom
+
         Point _center; //!< A point on the cylindrical axis prior to motion
         Real _radius; //!< Radius of the cylindrical surface
         Real _velocity; //!< Magnitude of velocity of the plane along its normal
@@ -42,6 +46,7 @@ class CylindricalSurfaceDirichletBC : public DirichletBCBase
         Real _angle_min; //!< Minimum angle in radians for active sector
         Real _angle_max; //!< Maximum angle in radians for active sector
         bool _invert_displacement; //!< Reverse the sign of the displacement correction
+        bool _beta; //!< A damping coefficient to help with stability 
 
         bool inAngularRange( const Point & pt ) const;
         Real computeSignedDistanceToSurface( const Point & pt ) const;

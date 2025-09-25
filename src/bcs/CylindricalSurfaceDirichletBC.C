@@ -18,6 +18,7 @@ CylindricalSurfaceDirichletBC::validParams()
     params.addParam< Real >( "angle_max", 6.28318530718, "Maximum angle in radians for active sector" );
     params.addParam< bool >( "invert_displacement", false, "Reverse the sign of the displacement correction" );
     params.addCoupledVar("displacements", "The displacements");
+    params.addParam< Real >( "beta", 1e-2, "A damping coefficient to aid in stability" );
 
     return params;
 }
@@ -25,6 +26,8 @@ CylindricalSurfaceDirichletBC::validParams()
 CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParameters & parameters )
     : // Call the constructor for the base class
         DirichletBCBase( parameters ),
+        _u_dot( _var.uDot( ) ),
+        _du_dot_du( _var.duDotDu( ) ),
         _center( getParam< Point >( "center" ) ),
         _radius( getParam< Real >( "radius" ) ),
         _velocity( getParam< Real >( "velocity" ) ),
@@ -33,7 +36,8 @@ CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParamet
         _use_sector( getParam< bool >( "use_sector" ) ),
         _angle_min( getParam< Real >( "angle_min" ) ),
         _angle_max( getParam< Real >( "angle_max" ) ),
-        _invert_displacement( getParam< bool >( "invert_displacement" ) )
+        _invert_displacement( getParam< bool >( "invert_displacement" ) ),
+        _beta( getParam< Real >( "beta" ) )
     {
         // Normalize direction of motion vector
         const Real len_normal = _normal.norm();
@@ -97,7 +101,7 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
 
 //        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
 
-        return _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir;
+        return _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir - _beta * _u_dot[ _qp ];
 
     }
 
@@ -125,7 +129,7 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
     if ( jvar_num == _var.number( ) ){
 
-        J += 1;
+        J += 1 - _beta * _du_dot_du[ _qp ];
 
 //        if ( _current_node->id( ) == 131 ){
 //            std::cerr << "first jacobian for var.number: " << _var.number( ) << ", " << jvar_num << "\n";
@@ -177,7 +181,7 @@ bool CylindricalSurfaceDirichletBC::isOverclosed() const{
         d *= -1.0;
     }
 
-    return d <= 1e-8;  // Apply only if node is outside or on the moving surface
+    return d <= 0;  // Apply only if node is outside or on the moving surface
 }
 
 bool CylindricalSurfaceDirichletBC::inAngularRange( const Point & pt ) const{
