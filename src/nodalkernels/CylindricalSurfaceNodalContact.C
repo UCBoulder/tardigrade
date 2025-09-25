@@ -103,6 +103,12 @@ Real CylindricalSurfaceNodalContact::computeQpResidual( ){
             s *= -1.0;
         }
 
+        if ( _current_node->id( ) == 1946 ){
+
+            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << _beta + _u_dot[ _qp ] << ": " << _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta + _u_dot[ _qp ] << "\n";
+
+        }
+
 //        std::cerr << "  s: " << s << "\n";
 
 //        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
@@ -206,8 +212,11 @@ bool CylindricalSurfaceNodalContact::inAngularRange( const Point & pt ) const{
         return true;
     }
 
+    // Current location of center point
+    const Point new_center = _center + _normal * ( _velocity * _t );
+
     // Perform calculation using original center location
-    RealVectorValue r_vec = pt - _center;
+    RealVectorValue r_vec = pt - new_center;
     Real axial_comp = r_vec * _axis;
     RealVectorValue radial_vec = r_vec - axial_comp * _axis;
 
