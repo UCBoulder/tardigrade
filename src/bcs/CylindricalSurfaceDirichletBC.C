@@ -100,11 +100,11 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
         }
 
 //        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
-        if ( _current_node->id( ) == 131 ){
-            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << + _beta * _u_dot[ _qp ] << " : " << _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir + _beta * _u_dot[ _qp ] << "\n";
-        }
+//        if ( _current_node->id( ) == 131 ){
+//            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << + _beta * _u_dot[ _qp ] << " : " << _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir + _beta * _u_dot[ _qp ] << "\n";
+//        }
 
-        return _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir + _beta * _u_dot[ _qp ];
+        return -( _u[ _qp ] + _beta * _u_dot[ _qp ] ) + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir;
 
     }
 
@@ -132,7 +132,7 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
     if ( jvar_num == _var.number( ) ){
 
-        J += 1 + _beta * _du_dot_du[ _qp ];
+        J -= 1 + _beta * _du_dot_du[ _qp ];
 
 //        if ( _current_node->id( ) == 131 ){
 //            std::cerr << "first jacobian for var.number: " << _var.number( ) << ", " << jvar_num << "\n";
