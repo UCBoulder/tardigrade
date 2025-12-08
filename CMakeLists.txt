@@ -79,6 +79,11 @@ endif()
 enable_testing()
 
 #================================================================================================= FIND DEPENDENCIES ===
+
+set(additional_fetchcontent_source_directories "")
+set(additional_fetchcontent_build_directories "")
+set(additional_fetchcontent_flag 0)
+
 # Find eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -123,6 +128,7 @@ FetchContent_MakeAvailable(fastor)
 if(EXISTS "${fastor_SOURCE_DIR}/Fastor")
     message(STATUS "Found Fastor: ${fastor_SOURCE_DIR}")
     include_directories(${fastor_SOURCE_DIR})
+    set(additional_fetchcontent_source_directories "${additional_fetchcontent_source_directories} -I${fastor_SOURCE_DIR}/Fastor")
 else()
     message(WARNING "Fastor not found or failed to fetch. Build may fail if Fastor headers are required.")
 endif()
@@ -133,9 +139,7 @@ set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools" "tardig
 # that xdmf is installed. This requirement may change in time
 set(optional_upstream_packages "overlap_coupling")
 include(FetchContent)
-set(additional_fetchcontent_source_directories "")
-set(additional_fetchcontent_build_directories "")
-set(additional_fetchcontent_flag 0)
+
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
     set(${package_upper}_BUILD_PYTHON_BINDINGS OFF CACHE INTERNAL "Setting ${package}'s python binding flag to off")
