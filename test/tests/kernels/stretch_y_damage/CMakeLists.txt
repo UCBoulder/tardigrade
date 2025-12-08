@@ -1,0 +1,6 @@
+set(input_filename "stretch_y_damage.i")
+set(csv_property_file "stretch_y_heterogeneous_parameters.csv")
+set(output_filename "gold/stretch_y_damage_out.e")
+target_sources(${PROJECT_NAME} PRIVATE ${input_filename} ${csv_property_file})
+target_sources(${PROJECT_NAME} PRIVATE ${output_filename})
+target_sources(${PROJECT_NAME} PRIVATE "tests")
