@@ -54,9 +54,7 @@ jobs:
             git clone https://github.com/romeric/Fastor.git
             cd Fastor
             cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$(python -c "import sys; print(sys.prefix)") .
-            conda activate tardigrade-env
-            chmod -R u+w "${CONDA_PREFIX}"
-            make install PREFIX="${CONDA_PREFIX}"
+            make
             cd ..
       - name: Get MOOSE
         shell: bash -el {0}
