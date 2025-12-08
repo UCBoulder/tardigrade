@@ -106,6 +106,27 @@ else()
     message(WARNING "Xdmf not found. Building without Xdmf components.")
 endif()
 
+# Find Fastor
+message(STATUS "Attempting to include Fastor (header-only tensor library)")
+include(FetchContent)
+# Option to override the Fastor version
+if(NOT DEFINED FASTOR_FETCHCONTENT_VERSION)
+    set(FASTOR_FETCHCONTENT_VERSION "master")
+endif()
+message(STATUS "  Fastor will be fetched using GIT_TAG: ${FASTOR_FETCHCONTENT_VERSION}")
+FetchContent_Declare(
+    fastor
+    GIT_REPOSITORY https://github.com/romeric/Fastor.git
+    GIT_TAG        ${FASTOR_FETCHCONTENT_VERSION}
+)
+FetchContent_MakeAvailable(fastor)
+if(EXISTS "${fastor_SOURCE_DIR}/Fastor")
+    message(STATUS "Found Fastor: ${fastor_SOURCE_DIR}")
+    include_directories(${fastor_SOURCE_DIR})
+else()
+    message(WARNING "Fastor not found or failed to fetch. Build may fail if Fastor headers are required.")
+endif()
+
 # Find related, but external, projects in installed environment
 set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools" "tardigrade_micromorphic_element")
 # Add overlap coupling if required. At this time, using overlap_coupling requires
