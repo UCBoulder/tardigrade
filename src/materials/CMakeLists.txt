@@ -1,1 +1,2 @@
 target_sources(${PROJECT_NAME} PRIVATE "MicromorphicMaterial.C"  "MicromorphicMaterialHeterogeneous.C")
+target_sources(${PROJECT_NAME} PRIVATE "GradientEnhancedDamagedMicromorphicMaterial.C" "GMCDPFiniteStrainDamage.C")
