@@ -49,12 +49,13 @@ jobs:
         shell: bash -el {0}
         run: |
             conda install --file ${{ steps.strings.outputs.environment-file }} --yes --channel https://conda.software.inl.gov/public --channel conda-forge --solver=libmamba
-      - name: get Fastor
+      - name: Install Fastor
         run: |
             git clone https://github.com/romeric/Fastor.git
             cd Fastor
             cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$(python -c "import sys; print(sys.prefix)") .
-            make install
+            chmod -R u+w "${CONDA_PREFIX}"
+            make install PREFIX="${CONDA_PREFIX}"
             cd ..
       - name: Get MOOSE
         shell: bash -el {0}
