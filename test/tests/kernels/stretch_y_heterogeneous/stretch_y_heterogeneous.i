@@ -736,7 +736,7 @@
   exodus = true
   perf_graph = true
   print_linear_residuals = true
-  interval = 1
+  time_step_interval = 1
   [log_output]
     type = CSV
   []
