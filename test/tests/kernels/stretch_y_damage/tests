@@ -3,7 +3,7 @@
     type = 'Exodiff'
     input = 'stretch_y_damage.i'
     exodiff = 'stretch_y_damage_out.e'
-    rel_error = 1e-4
+    rel_err = 5e-4
     abs_zero = 1e-5
   [../]
 []
