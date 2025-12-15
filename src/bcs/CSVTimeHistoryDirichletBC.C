@@ -43,9 +43,15 @@ void CSVTimeHistoryDirichletBC::initialSetup(){
 
     // 1) Collect unique node IDs in the requested boundary set(s)
     const libMesh::BoundaryInfo & boundary_info = mesh.get_boundary_info();
+    auto node_bc_list = boundary_info.build_node_list();
     std::vector< dof_id_type > all_node_ids;
-    std::vector< BoundaryID >  all_bids;
-    boundary_info.build_node_list( all_node_ids, all_bids );
+    std::vector< BoundaryID >  all_boundary_ids;
+    all_node_ids.reserve( node_bc_list.size() );
+    all_boundary_ids.reserve( node_bc_list.size() );
+    for (const auto &[ nid, bid ] : node_bc_list ){
+        all_node_ids.push_back( nid );
+        all_boundary_ids.push_back( bid );
+    }
 
     // turn boundary IDs into a set
     std::unordered_set< BoundaryID > target_boundary_IDs( boundaryIDs().begin(), boundaryIDs().end() );
@@ -53,7 +59,7 @@ void CSVTimeHistoryDirichletBC::initialSetup(){
     // collect nodes that belong to the boundary
     std::set< dof_id_type > tmp_nodes;
     for ( std::size_t i = 0; i < all_node_ids.size(); ++i ){
-        if ( target_boundary_IDs.count( all_bids[ i ] ) ){
+        if ( target_boundary_IDs.count( all_boundary_ids[ i ] ) ){
             tmp_nodes.insert( all_node_ids[ i ] );
         }
     }
