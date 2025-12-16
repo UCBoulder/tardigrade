@@ -79,6 +79,11 @@ endif()
 enable_testing()
 
 #================================================================================================= FIND DEPENDENCIES ===
+
+set(additional_fetchcontent_source_directories "")
+set(additional_fetchcontent_build_directories "")
+set(additional_fetchcontent_flag 0)
+
 # Find eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -106,15 +111,35 @@ else()
     message(WARNING "Xdmf not found. Building without Xdmf components.")
 endif()
 
+# Find Fastor
+message(STATUS "Attempting to include Fastor (header-only tensor library)")
+include(FetchContent)
+# Option to override the Fastor version
+if(NOT DEFINED FASTOR_FETCHCONTENT_VERSION)
+    set(FASTOR_FETCHCONTENT_VERSION "master")
+endif()
+message(STATUS "  Fastor will be fetched using GIT_TAG: ${FASTOR_FETCHCONTENT_VERSION}")
+FetchContent_Declare(
+    fastor
+    GIT_REPOSITORY https://github.com/romeric/Fastor.git
+    GIT_TAG        ${FASTOR_FETCHCONTENT_VERSION}
+)
+FetchContent_MakeAvailable(fastor)
+if(EXISTS "${fastor_SOURCE_DIR}/Fastor")
+    message(STATUS "Found Fastor: ${fastor_SOURCE_DIR}")
+    include_directories(${fastor_SOURCE_DIR})
+    set(additional_fetchcontent_source_directories "${additional_fetchcontent_source_directories} -I${fastor_SOURCE_DIR}")
+else()
+    message(WARNING "Fastor not found or failed to fetch. Build may fail if Fastor headers are required.")
+endif()
+
 # Find related, but external, projects in installed environment
 set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools" "tardigrade_micromorphic_element")
 # Add overlap coupling if required. At this time, using overlap_coupling requires
 # that xdmf is installed. This requirement may change in time
 set(optional_upstream_packages "overlap_coupling")
 include(FetchContent)
-set(additional_fetchcontent_source_directories "")
-set(additional_fetchcontent_build_directories "")
-set(additional_fetchcontent_flag 0)
+
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
     set(${package_upper}_BUILD_PYTHON_BINDINGS OFF CACHE INTERNAL "Setting ${package}'s python binding flag to off")
