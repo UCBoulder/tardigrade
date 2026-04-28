@@ -99,11 +99,6 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
             s *= -1.0;
         }
 
-//        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
-//        if ( _current_node->id( ) == 131 ){
-//            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << + _beta * _u_dot[ _qp ] << " : " << _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir + _beta * _u_dot[ _qp ] << "\n";
-//        }
-
         return -( _u[ _qp ] + _beta * _u_dot[ _qp ] ) + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir;
 
     }
@@ -134,9 +129,6 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
         J -= 1 + _beta * _du_dot_du[ _qp ];
 
-//        if ( _current_node->id( ) == 131 ){
-//            std::cerr << "first jacobian for var.number: " << _var.number( ) << ", " << jvar_num << "\n";
-//        }
     }
 
     if ( val != _displacements.end( ) ){
@@ -153,16 +145,6 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
         J += s * ( _radius / ( radial_vec.norm( ) * radial_vec.norm( ) * radial_vec.norm( ) + 1e-9 ) ) * radial_vec( val - _displacements.begin( ) ) * ( radial_vec * _disp_dir )
            + s * ( 1 - _radius / ( radial_vec.norm( ) + 1e-9 ) ) * ( _disp_dir - _axis * _disp_dir * _axis )( val - _displacements.begin( ) );
-
-//        if ( _current_node->id( ) == 1 ){
-//
-//            std::cerr << "d: " << _current_node->id( ) << ", " << computeSignedDistanceToSurface( *_current_node ) << "\n";
-//
-//        }
-//
-//        if ( _current_node->id( ) == 131 ){
-//            std::cerr << "var.number: " << _var.number( ) << ", " << jvar_num << ", " << s << ", " << *_current_node << ", " << _center << ", " << radial_vec << ", " << _normal << ", " << _disp_dir << ", " << J << "\n";
-//        }
 
     }
 

@@ -84,39 +84,18 @@ Real CylindricalSurfaceNodalContact::computeQpResidual( ){
 
     if ( isOverclosed( ) ){
 
-//        std::cerr << "is overclosed\n";
-//
-//        std::cerr << "computing d\n";
         Real d = computeSignedDistanceToSurface( *_current_node );
 
-//        std::cerr << "  d: " << d << "\n";
-
-//        std::cerr << "computing radial vec\n";
         const Point new_center = _center + _normal * ( _velocity * _t );
         RealVectorValue r_vec = *_current_node - new_center;
         Real axial_comp = r_vec * _axis;
         RealVectorValue radial_vec = r_vec - axial_comp * _axis;
-//        std::cerr << "  radial_vec: " << radial_vec << "\n";
 
         Real s = 1.0;
         if ( _invert_displacement ){
             s *= -1.0;
         }
 
-//        if ( _current_node->id( ) == 1946 ){
-//
-//            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << _beta * _u_dot[ _qp ] << ": " << _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ] << "\n";
-//
-//        }
-
-//        std::cerr << "  s: " << s << "\n";
-
-//        std::cerr << _current_node->id( ) << ", " << *_current_node << ", " << s * displacement_vector << ", " << _disp_dir << ", " << displacement_vector * _disp_dir << "\n";
-//        if ( _current_node->id( ) == 131 ){
-//            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << + _beta * _u_dot[ _qp ] << " : " << _u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir + _beta * _u_dot[ _qp ] << "\n";
-//        }
-
-//        std::cerr << "  returning residual\n";
         return _penalty_parameter * ( s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ];
 
     }
@@ -147,9 +126,6 @@ Real CylindricalSurfaceNodalContact::computeQpOffDiagJacobian( const unsigned in
 
         J -= _beta * _du_dot_du[ _qp ];
 
-//        if ( _current_node->id( ) == 131 ){
-//            std::cerr << "first jacobian for var.number: " << _var.number( ) << ", " << jvar_num << "\n";
-//        }
     }
 
     if ( val != _displacements.end( ) ){
@@ -168,16 +144,6 @@ Real CylindricalSurfaceNodalContact::computeQpOffDiagJacobian( const unsigned in
                 s * ( _radius / ( radial_vec.norm( ) * radial_vec.norm( ) * radial_vec.norm( ) + 1e-9 ) ) * radial_vec( val - _displacements.begin( ) ) * ( radial_vec * _disp_dir )
               + s * ( 1 - _radius / ( radial_vec.norm( ) + 1e-9 ) ) * ( _disp_dir - _axis * _disp_dir * _axis )( val - _displacements.begin( ) )
         );
-
-//        if ( _current_node->id( ) == 1 ){
-//
-//            std::cerr << "d: " << _current_node->id( ) << ", " << computeSignedDistanceToSurface( *_current_node ) << "\n";
-//
-//        }
-//
-//        if ( _current_node->id( ) == 131 ){
-//            std::cerr << "var.number: " << _var.number( ) << ", " << jvar_num << ", " << s << ", " << *_current_node << ", " << _center << ", " << radial_vec << ", " << _normal << ", " << _disp_dir << ", " << J << "\n";
-//        }
 
     }
 
