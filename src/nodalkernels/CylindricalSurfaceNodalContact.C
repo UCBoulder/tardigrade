@@ -103,11 +103,11 @@ Real CylindricalSurfaceNodalContact::computeQpResidual( ){
             s *= -1.0;
         }
 
-        if ( _current_node->id( ) == 1946 ){
-
-            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << _beta * _u_dot[ _qp ] << ": " << _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ] << "\n";
-
-        }
+//        if ( _current_node->id( ) == 1946 ){
+//
+//            std::cerr << "\n" << _var.number( ) << ", " << _u[ _qp ] << ", " << s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir << ", " << _beta * _u_dot[ _qp ] << ": " << _penalty_parameter * ( -_u[ _qp ] + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ] << "\n";
+//
+//        }
 
 //        std::cerr << "  s: " << s << "\n";
 
