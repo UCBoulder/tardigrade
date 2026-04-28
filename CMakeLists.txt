@@ -63,7 +63,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Set the c++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O3")
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt")
 endif()
@@ -80,10 +80,17 @@ enable_testing()
 
 #================================================================================================= FIND DEPENDENCIES ===
 # Find eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-include_directories(${EIGEN3_INCLUDE_DIR})
+find_package(Eigen3 3.3 NO_MODULE)
 if(EIGEN3_FOUND)
-    message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
+    message(STATUS "Found Eigen3 (less than version 3.4.1): ${EIGEN3_INCLUDE_DIR}")
+else()
+    find_package(Eigen3 3.4...5 NO_MODULE)
+    if(EIGEN3_FOUND)
+        message(STATUS "Found Eigen3 (less than version 5): ${EIGEN3_INCLUDE_DIR}")
+    else()
+        find_package(Eigen3 5 REQUIRED NO_MODULE)
+        message(STATUS "Found Eigen3 (version 5): ${EIGEN3_INCLUDE_DIR}")
+    endif()
 endif()
 
 # Find Xdmf

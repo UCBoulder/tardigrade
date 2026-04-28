@@ -1,13 +1,13 @@
-#include<CylindricalSurfaceDirichletBC.h>
+#include<CylindricalSurfaceNodalContact.h>
 #include<cmath>
 
 //Register the object
-registerMooseObject( "tardigradeApp", CylindricalSurfaceDirichletBC );
+registerMooseObject( "tardigradeApp", CylindricalSurfaceNodalContact );
 
 InputParameters
-CylindricalSurfaceDirichletBC::validParams()
+CylindricalSurfaceNodalContact::validParams()
 {
-    InputParameters params = DirichletBCBase::validParams();
+    InputParameters params = NodalKernel::validParams();
     params.addRequiredParam< Point >( "center", "A point on the cylindrical axis prior to motion" );
     params.addRequiredParam< Real >( "radius", "Radius of the cylindrical surface" );
     params.addRequiredParam< Real >( "velocity", "Magnitude of velocity of the plane along its normal" );
@@ -18,14 +18,15 @@ CylindricalSurfaceDirichletBC::validParams()
     params.addParam< Real >( "angle_max", 6.28318530718, "Maximum angle in radians for active sector" );
     params.addParam< bool >( "invert_displacement", false, "Reverse the sign of the displacement correction" );
     params.addCoupledVar("displacements", "The displacements");
+    params.addParam< Real >( "penalty_parameter", 1e3, "The penalty parameter applied to the overclosed distance" );
     params.addParam< Real >( "beta", 1e-2, "A damping coefficient to aid in stability" );
 
     return params;
 }
 
-CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParameters & parameters )
+CylindricalSurfaceNodalContact::CylindricalSurfaceNodalContact( const InputParameters & parameters )
     : // Call the constructor for the base class
-        DirichletBCBase( parameters ),
+        NodalKernel( parameters ),
         _u_dot( _var.uDot( ) ),
         _du_dot_du( _var.duDotDu( ) ),
         _center( getParam< Point >( "center" ) ),
@@ -37,6 +38,7 @@ CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParamet
         _angle_min( getParam< Real >( "angle_min" ) ),
         _angle_max( getParam< Real >( "angle_max" ) ),
         _invert_displacement( getParam< bool >( "invert_displacement" ) ),
+        _penalty_parameter( getParam< Real >( "penalty_parameter" ) ),
         _beta( getParam< Real >( "beta" ) )
     {
         // Normalize direction of motion vector
@@ -77,13 +79,8 @@ CylindricalSurfaceDirichletBC::CylindricalSurfaceDirichletBC( const InputParamet
 
 }
 
-Real CylindricalSurfaceDirichletBC::computeQpValue( ){
+Real CylindricalSurfaceNodalContact::computeQpResidual( ){
 
-    mooseError( "This approach isn't allowed!" );
-
-}
-
-Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
 
     if ( isOverclosed( ) ){
 
@@ -99,7 +96,7 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
             s *= -1.0;
         }
 
-        return -( _u[ _qp ] + _beta * _u_dot[ _qp ] ) + s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir;
+        return _penalty_parameter * ( s * d * radial_vec / ( radial_vec.norm( ) + 1e-9 ) * _disp_dir ) - _beta * _u_dot[ _qp ];
 
     }
 
@@ -107,17 +104,17 @@ Real CylindricalSurfaceDirichletBC::computeQpResidual( ){
 
 }
 
-Real CylindricalSurfaceDirichletBC::computeQpJacobian( ){
+Real CylindricalSurfaceNodalContact::computeQpJacobian( ){
 
     return computeQpOffDiagJacobian( _var.number( ) );
 
 }
 
-Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int jvar_num ){
+Real CylindricalSurfaceNodalContact::computeQpOffDiagJacobian( const unsigned int jvar_num ){
 
     if ( !isOverclosed( ) ){
 
-        return 1e-9;
+        return 0;
 
     }
 
@@ -127,7 +124,7 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
     if ( jvar_num == _var.number( ) ){
 
-        J -= 1 + _beta * _du_dot_du[ _qp ];
+        J -= _beta * _du_dot_du[ _qp ];
 
     }
 
@@ -143,8 +140,10 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
             s *= -1.0;
         }
 
-        J += s * ( _radius / ( radial_vec.norm( ) * radial_vec.norm( ) * radial_vec.norm( ) + 1e-9 ) ) * radial_vec( val - _displacements.begin( ) ) * ( radial_vec * _disp_dir )
-           + s * ( 1 - _radius / ( radial_vec.norm( ) + 1e-9 ) ) * ( _disp_dir - _axis * _disp_dir * _axis )( val - _displacements.begin( ) );
+        J += _penalty_parameter * (
+                s * ( _radius / ( radial_vec.norm( ) * radial_vec.norm( ) * radial_vec.norm( ) + 1e-9 ) ) * radial_vec( val - _displacements.begin( ) ) * ( radial_vec * _disp_dir )
+              + s * ( 1 - _radius / ( radial_vec.norm( ) + 1e-9 ) ) * ( _disp_dir - _axis * _disp_dir * _axis )( val - _displacements.begin( ) )
+        );
 
     }
 
@@ -152,9 +151,13 @@ Real CylindricalSurfaceDirichletBC::computeQpOffDiagJacobian( const unsigned int
 
 }
 
-bool CylindricalSurfaceDirichletBC::shouldApply( ) const{ return isOverclosed( ); }
+bool CylindricalSurfaceNodalContact::isOverclosed() const{
 
-bool CylindricalSurfaceDirichletBC::isOverclosed() const{
+    if ( !_current_node ){
+
+        mooseError( "The current node pointer is null!" );
+
+    }
 
     if ( !inAngularRange( *_current_node ) ){
         return false;
@@ -169,14 +172,17 @@ bool CylindricalSurfaceDirichletBC::isOverclosed() const{
     return d <= 0;  // Apply only if node is outside or on the moving surface
 }
 
-bool CylindricalSurfaceDirichletBC::inAngularRange( const Point & pt ) const{
+bool CylindricalSurfaceNodalContact::inAngularRange( const Point & pt ) const{
 
     if ( !_use_sector ){
         return true;
     }
 
+    // Current location of center point
+    const Point new_center = _center + _normal * ( _velocity * _t );
+
     // Perform calculation using original center location
-    RealVectorValue r_vec = pt - _center;
+    RealVectorValue r_vec = pt - new_center;
     Real axial_comp = r_vec * _axis;
     RealVectorValue radial_vec = r_vec - axial_comp * _axis;
 
@@ -188,7 +194,7 @@ bool CylindricalSurfaceDirichletBC::inAngularRange( const Point & pt ) const{
     return theta >= _angle_min && theta <= _angle_max;
 }
 
-Real CylindricalSurfaceDirichletBC::computeSignedDistanceToSurface( const Point & pt ) const{
+Real CylindricalSurfaceNodalContact::computeSignedDistanceToSurface( const Point & pt ) const{
 
     // Current location of center point
     const Point new_center = _center + _normal * ( _velocity * _t );

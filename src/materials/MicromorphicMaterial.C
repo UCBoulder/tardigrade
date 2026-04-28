@@ -504,7 +504,7 @@ void MicromorphicMaterial::computeQpProperties(){
                     );
 
     if ( errorCode == 1 ){
-        std::string error_message = "Convergence not achieved in material model. Requesting timestep cutback.\n";
+        std::string error_message = "Convergence not achieved in material model for element " + std::to_string( _current_elem->id( ) ) + ". Requesting timestep cutback.\n";
         error_message += output_message;
         mooseException( error_message.c_str() );
     }

@@ -1,25 +1,21 @@
 #ifndef CYLINDRICALSURFACEDIRICHLETBC_H
 #define CYLINDRICALSURFACEDIRICHLETBC_H
 
-#include<DirichletBCBase.h>
+#include<NodalKernel.h>
 
-class CylindricalSurfaceDirichletBC : public DirichletBCBase
+class CylindricalSurfaceNodalContact : public NodalKernel
 {
 
     public:
 
-        CylindricalSurfaceDirichletBC( const InputParameters &parameters );
+        CylindricalSurfaceNodalContact( const InputParameters &parameters );
 
         static InputParameters validParams();
 
 
     protected:
 
-        virtual bool shouldApply( ) const override;
-
         virtual bool isOverclosed() const;
-
-        virtual Real computeQpValue( ) override;
 
         virtual Real computeQpResidual() override;
 
@@ -46,6 +42,8 @@ class CylindricalSurfaceDirichletBC : public DirichletBCBase
         Real _angle_min; //!< Minimum angle in radians for active sector
         Real _angle_max; //!< Maximum angle in radians for active sector
         bool _invert_displacement; //!< Reverse the sign of the displacement correction
+        Real _penalty_parameter; //!< The penalty parameter applied to the overclosed distance
+
         bool _beta; //!< A damping coefficient to help with stability 
 
         bool inAngularRange( const Point & pt ) const;
