@@ -1,0 +1,8 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'compress_y_moving_plane.i'
+    exodiff = 'compress_y_moving_plane_out.e'
+    abs_zero = 1e-8
+  [../]
+[]

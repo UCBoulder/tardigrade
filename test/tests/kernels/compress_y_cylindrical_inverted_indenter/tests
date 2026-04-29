@@ -1,0 +1,8 @@
+[Tests]
+#  [./test]
+#    type = 'Exodiff'
+#    input = 'compress_y_cylindrical_inverted_indenter.i'
+#    exodiff = 'compress_y_cylindrical_inverted_indenter_out.e'
+#    abs_zero = 1e-8
+#  [../]
+[]

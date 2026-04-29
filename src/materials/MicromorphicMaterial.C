@@ -478,12 +478,16 @@ void MicromorphicMaterial::computeQpProperties(){
     //Set the state variables to the previously converged values
     _SDVS[ _qp ] = _old_SDVS[ _qp ];
 
+    //load material parameters into fparams array
+    std::vector< double > fparams;
+    defineMaterialParameters( fparams );
+
 //    if ( _qp == 0 ){
 //        std::cout << "SDVS pre model evaluation:\n";
 //        vectorTools::print( _SDVS[ _qp ] );
 //    }
 
-    int errorCode = material->evaluate_model( time, _fparams,
+    int errorCode = material->evaluate_model( time, fparams,
                                               __grad_u, __phi, __grad_phi,
                                               __old_grad_u, __old_phi, __old_grad_phi,
                                               _SDVS[ _qp ],
@@ -500,7 +504,7 @@ void MicromorphicMaterial::computeQpProperties(){
                     );
 
     if ( errorCode == 1 ){
-        std::string error_message = "Convergence not achieved in material model. Requesting timestep cutback.\n";
+        std::string error_message = "Convergence not achieved in material model for element " + std::to_string( _current_elem->id( ) ) + ". Requesting timestep cutback.\n";
         error_message += output_message;
         mooseException( error_message.c_str() );
     }
@@ -842,7 +846,7 @@ void MicromorphicMaterial::computeQpProperties(){
         debug.clear();
 #endif
 
-        errorCode = material->evaluate_model( time, _fparams,
+        errorCode = material->evaluate_model( time, fparams,
                                               mms_grad_u, mms_phi, mms_grad_phi,
                                               mms_old_grad_u, mms_old_phi, mms_old_grad_phi,
                                               mms_SDVS,

@@ -1,5 +1,6 @@
 #===================================================================================================== PROJECT SETUP ===
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.19)
+cmake_policy(SET CMP0110 NEW)
 project(tardigrade)
 set(PROJECT_EXECUTABLE_NAME "tardigrade-opt")
 
@@ -21,6 +22,10 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ADDITIONAL_INSTALL_DIRECTORIES})
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
 
+# Set the number of cores available for building moose
+set(MOOSE_BUILD_CORE_COUNT 4 CACHE STRING "The number of cores available to build moose")
+set(TARDIGRADE_TEST_CORE_COUNT 4 CACHE STRING "The number of cores available to test tardigrade")
+
 # Set build type checks
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower)
 set(upstream_required "")
@@ -36,18 +41,16 @@ elseif(cmake_build_type_lower STREQUAL "conda-test")
 endif()
 
 # Get version number from Git
-set(VERSION_UPDATE_FROM_GIT True)
 if(${not_conda_test} STREQUAL "true")
-    # TODO: On osx-arm64 some c++ projects struggle to find $PREFIX/bin/python during conda-builds and others don't.
-    # Trace the source and remove the hint when CMake configures with the correct python version during conda-build.
-    if (DEFINED ENV{PREFIX})
-        set(Python_ROOT_DIR "$ENV{PREFIX}/bin")
-    endif()
     find_package(Python COMPONENTS Interpreter REQUIRED)
     execute_process(COMMAND ${Python_EXECUTABLE} -m setuptools_scm
                             OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING_FULL
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" ${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL})
+    if(${${PROJECT_NAME}_VERSION_STRING_FULL} STREQUAL "")
+        set(${PROJECT_NAME}_VERSION 0.0.0)
+    else()
+         string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" ${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_VERSION_STRING_FULL})
+    endif()
     project(${PROJECT_NAME} VERSION ${${PROJECT_NAME}_VERSION})
 endif()
 
@@ -60,9 +63,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Set the c++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O3")
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt")
+endif()
+
+# Force all errors to be convergence errors
+set(TARDIGRADE_SET_FATAL_AS_CONVERGENCE ON CACHE BOOL "Flag for whether to force fatal errors to be treated as convergence errors")
+
+if(TARDIGRADE_SET_FATAL_AS_CONVERGENCE)
+    add_compile_definitions(TARDIGRADE_FATAL_AS_CONVERGENCE)
 endif()
 
 # Enable CTest
@@ -70,10 +80,17 @@ enable_testing()
 
 #================================================================================================= FIND DEPENDENCIES ===
 # Find eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-include_directories(${EIGEN3_INCLUDE_DIR})
+find_package(Eigen3 3.3 NO_MODULE)
 if(EIGEN3_FOUND)
-    message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
+    message(STATUS "Found Eigen3 (less than version 3.4.1): ${EIGEN3_INCLUDE_DIR}")
+else()
+    find_package(Eigen3 3.4...5 NO_MODULE)
+    if(EIGEN3_FOUND)
+        message(STATUS "Found Eigen3 (less than version 5): ${EIGEN3_INCLUDE_DIR}")
+    else()
+        find_package(Eigen3 5 REQUIRED NO_MODULE)
+        message(STATUS "Found Eigen3 (version 5): ${EIGEN3_INCLUDE_DIR}")
+    endif()
 endif()
 
 # Find Xdmf
@@ -102,21 +119,31 @@ set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools" "tardig
 # that xdmf is installed. This requirement may change in time
 set(optional_upstream_packages "overlap_coupling")
 include(FetchContent)
+set(additional_fetchcontent_source_directories "")
+set(additional_fetchcontent_build_directories "")
+set(additional_fetchcontent_flag 0)
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
+    set(${package_upper}_BUILD_PYTHON_BINDINGS OFF CACHE INTERNAL "Setting ${package}'s python binding flag to off")
     find_package(${package} ${upstream_required} CONFIG)
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
     else()
         # Find related, but external, projects using FetchContent and building locally
         message(WARNING "Did not find an installed ${package} package. Attempting local build with FetchContent.")
-        # TODO: Decide how to handle main/dev build differences. bash env variables for GIT TAG?
+        if(NOT DEFINED ${package_upper}_FETCHCONTENT_VERSION)
+            set(${package_upper}_FETCHCONTENT_VERSION "origin/dev")
+        endif()
+        message("${package_upper} is being built with version ${${package_upper}_FETCHCONTENT_VERSION}")
         FetchContent_Declare(
             ${package}
-            GIT_REPOSITORY ssh://git@re-git.lanl.gov:10022/aea/material-models/${package}.git
-            GIT_TAG        origin/dev
+            GIT_REPOSITORY https://github.com/UCBoulder/${package}.git
+            GIT_TAG        ${${package_upper}_FETCHCONTENT_VERSION}
         )
         FetchContent_MakeAvailable(${package})
+        set(additional_fetchcontent_source_directories "${additional_fetchcontent_source_directories} -I${${package}_SOURCE_DIR}/src/cpp")
+        set(additional_fetchcontent_build_directories "${additional_fetchcontent_build_directories} -L${${package}_BINARY_DIR}/src/cpp")
+        set(additional_fetchcontent_flag 1)
     endif()
 endforeach(package)
 
@@ -185,13 +212,14 @@ if(cmake_build_type_lower STREQUAL release)
 endif()
 
 add_custom_target(${PROJECT_NAME} ALL
-                  COMMAND MOOSE_DIR=$ENV{MOOSE_DIR} make -j4 -f "${PROJECT_NAME}_Makefile"
+                  COMMAND MOOSE_DIR=$ENV{MOOSE_DIR} make -j ${MOOSE_BUILD_CORE_COUNT} -f "${PROJECT_NAME}_Makefile"
                   WORKING_DIRECTORY ${PROJECT_BINARY_DIRECTORY})
 
 include_directories(${CPP_INC_PATH})
 add_subdirectory(${CPP_SRC_PATH})
 add_subdirectory(${CPP_INC_PATH})
 add_subdirectory(${CPP_TEST_PATH})
+add_dependencies(${PROJECT_NAME} micromat microbalance)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     find_package(Boost 1.53.0 REQUIRED COMPONENTS unit_test_framework)
@@ -199,7 +227,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     target_sources(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/testroot")
     target_sources(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/run_tests")
     add_test(NAME "${PROJECT_NAME}_Regression_Tests"
-             COMMAND run_tests
+             COMMAND run_tests -j ${TARDIGRADE_TEST_CORE_COUNT}
              WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     set_tests_properties("${PROJECT_NAME}_Regression_Tests" PROPERTIES
                          ENVIRONMENT MOOSE_DIR=$ENV{MOOSE_DIR} )

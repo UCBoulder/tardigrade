@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'test_CSVTimeHistoryDirichletBC.i'
+    exodiff = 'test_CSVTimeHistoryDirichletBC_out.e'
+  [../]
+[]

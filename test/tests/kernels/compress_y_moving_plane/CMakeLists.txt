@@ -1,0 +1,5 @@
+set(input_filename "compress_y_moving_plane.i")
+set(output_filename "gold/compress_y_moving_plane_out.e")
+target_sources(${PROJECT_NAME} PRIVATE ${input_filename})
+target_sources(${PROJECT_NAME} PRIVATE ${output_filename})
+target_sources(${PROJECT_NAME} PRIVATE "tests")

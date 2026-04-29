@@ -21,7 +21,7 @@ tardigradeApp::~tardigradeApp() {}
 void
 tardigradeApp::registerAll(Factory & f, ActionFactory & af, Syntax & s)
 {
-  ModulesApp::registerAll(f, af, s);
+  ModulesApp::registerAllObjects<tardigradeApp>(f, af, s);
   Registry::registerObjectsTo(f, {"tardigradeApp"});
   Registry::registerActionsTo(af, {"tardigradeApp"});
 
