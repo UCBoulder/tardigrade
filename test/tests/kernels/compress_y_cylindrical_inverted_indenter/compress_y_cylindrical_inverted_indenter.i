@@ -384,7 +384,7 @@
     variable = disp_x
     boundary = 'left'
     preset = true
-    value = 0
+    expression = 0
   [../]
   [./back_z]
     type = DirichletBC
@@ -392,7 +392,7 @@
     variable = disp_z
     boundary = 'back'
     preset = true
-    value = 0
+    expression = 0
   [../]
   [./bottom_y]
     type = DirichletBC
@@ -400,7 +400,7 @@
     variable = disp_y
     boundary = 'bottom'
     preset = true
-    value = 0
+    expression = 0
   [../]
   [./top_y]
     type = CylindricalSurfaceDirichletBC

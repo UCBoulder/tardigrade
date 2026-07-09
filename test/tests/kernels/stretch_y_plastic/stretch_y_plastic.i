@@ -590,7 +590,7 @@
     variable = disp_x
     boundary = 'top'
     preset = true
-    value    = 0
+    value = 0
   [../]
   [./top_y]
     #type = DirichletBC
@@ -607,7 +607,7 @@
 [Functions]
   [./top_bc]
     type  = ParsedFunction
-    value = 0.1*t
+    expression = 0.1*t
   [../]
 []
 

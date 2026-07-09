@@ -437,61 +437,61 @@
 [Functions]
   [./u1_fxn]
     type  = ParsedFunction
-    value = 1.721
+    expression = 1.721
   [../]
   [./u2_fxn]
     type  = ParsedFunction
-    value = 0.321
+    expression = 0.321
   [../]
   [./u3_fxn]
     type  = ParsedFunction
-    value = -0.981
+    expression = -0.981
   [../]
   [./phi_11_fxn]
     type = ParsedFunction
-#    value = -.2152
-    value = 0.054142
+#    expression = -.2152
+    expression = 0.054142
   [../]
   [./phi_22_fxn]
     type = ParsedFunction
-#    value = 1.31
-    value = 0.07059678
+#    expression = 1.31
+    expression = 0.07059678
   [../]
   [./phi_33_fxn]
     type = ParsedFunction
-    #value = 2.142
-#    value = -.521
-    value = 0.04161017
+    #expression = 2.142
+#    expression = -.521
+    expression = 0.04161017
   [../]
   [./phi_23_fxn]
     type = ParsedFunction
-#    value = -0.177
-    value = -0.00516283
+#    expression = -0.177
+    expression = -0.00516283
   [../]
   [./phi_13_fxn]
     type = ParsedFunction
-#    value = 0.606
-    value = -0.0056683
+#    expression = 0.606
+    expression = -0.0056683
   [../]
   [./phi_12_fxn]
     type = ParsedFunction
-#    value = 3.72
-    value = 0.00955174
+#    expression = 3.72
+    expression = 0.00955174
   [../]
   [./phi_32_fxn]
     type = ParsedFunction
-#    value = .827
-    value = 0.01006055
+#    expression = .827
+    expression = 0.01006055
   [../]
   [./phi_31_fxn]
     type = ParsedFunction
-#    value = .718
-    value = 0.00635417
+#    expression = .718
+    expression = 0.00635417
   [../]
   [./phi_21_fxn]
     type = ParsedFunction
-#    value = 2.271
-    value = -0.00823092
+#    expression = 2.271
+    expression = -0.00823092
   [../]
 []
 
