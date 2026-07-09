@@ -421,13 +421,13 @@
     type = PresetBC
     variable = disp_z
     boundary = 'back'
-    value = 0
+    expression = 0
   [../]
   [./front_z]
     type = PresetBC
     variable = disp_z
     boundary = 'front'
-    value = 0
+    expression = 0
   [../]
   [./bottom_x]
     type     = FunctionDirichletBC
@@ -458,19 +458,19 @@
 [Functions]
   [./fixed_x]
     type  = ParsedFunction
-    value = 'x*(cos(pi*t)-1)-y*sin(pi*t)'
+    expression = 'x*(cos(pi*t)-1)-y*sin(pi*t)'
   [../]
   [./fixed_y]
     type  = ParsedFunction
-    value = 'x*sin(pi*t)+y*(cos(pi*t)-1)'
+    expression = 'x*sin(pi*t)+y*(cos(pi*t)-1)'
   [../]
   [./moving_x]
     type  = ParsedFunction
-    value = 'x*(cos(pi*t)-1)-y*sin(pi*t)'
+    expression = 'x*(cos(pi*t)-1)-y*sin(pi*t)'
   [../]
   [./moving_y]
     type  = ParsedFunction
-    value = 'x*sin(pi*t)+y*(cos(pi*t)-1)'
+    expression = 'x*sin(pi*t)+y*(cos(pi*t)-1)'
   [../]
 []
 
