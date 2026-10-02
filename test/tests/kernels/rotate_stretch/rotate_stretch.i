@@ -454,19 +454,19 @@
 [Functions]
   [./fixed_x]
     type  = ParsedFunction
-    value = 'x*(cos(pi*t)-1)-y*sin(pi*t)'
+    expression = x*(cos(pi*t)-1)-y*sin(pi*t)
   [../]
   [./fixed_y]
     type  = ParsedFunction
-    value = 'x*sin(pi*t)+y*(cos(pi*t)-1)'
+    expression = x*sin(pi*t)+y*(cos(pi*t)-1)
   [../]
   [./moving_x]
     type  = ParsedFunction
-    value = 'x*(cos(pi*t)-1)-(1+0.05*t)*y*sin(pi*t)'
+    expression = x*(cos(pi*t)-1)-(1+0.05*t)*y*sin(pi*t)
   [../]
   [./moving_y]
     type  = ParsedFunction
-    value = 'x*sin(pi*t)+(1+0.05*t)*y*(cos(pi*t)-1)'
+    expression = x*sin(pi*t)+(1+0.05*t)*y*(cos(pi*t)-1)
   [../]
 []
 
